@@ -129,6 +129,8 @@ const FlagQuizApp: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>('loading');
   const [errorCode, setErrorCode] = useState<ErrorCode>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [lastScore, setLastScore] = useState<number | null>(null);
+  const [bestScore, setBestScore] = useState<number | null>(null);
 
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [totalQuestions, setTotalQuestions] = useState<number | 'all' | null>(
@@ -156,6 +158,20 @@ const FlagQuizApp: React.FC = () => {
       }
     };
     fetchCountries();
+  }, []);
+
+  // load persisted scores from localStorage once on mount
+  useEffect(() => {
+    try {
+      const keyLast = 'flag-quiz-last-score';
+      const keyBest = 'flag-quiz-best-score';
+      const rawLast = localStorage.getItem(keyLast);
+      const rawBest = localStorage.getItem(keyBest);
+      setLastScore(rawLast !== null ? Number(rawLast) : null);
+      setBestScore(rawBest !== null ? Number(rawBest) : null);
+    } catch (e) {
+      // ignore storage errors (e.g., SSR or blocked storage)
+    }
   }, []);
 
   const setupQuestion = useCallback(() => {
@@ -272,6 +288,28 @@ const FlagQuizApp: React.FC = () => {
     else setupQuestion();
   };
 
+  // persist last and best score when entering results
+  useEffect(() => {
+    if (gameState === 'results') {
+      try {
+        const keyLast = 'flag-quiz-last-score';
+        const keyBest = 'flag-quiz-best-score';
+        const prevBestRaw = localStorage.getItem(keyBest);
+        const prevBest = prevBestRaw ? Number(prevBestRaw) : null;
+        localStorage.setItem(keyLast, String(score));
+        setLastScore(score);
+        if (prevBest === null || score > prevBest) {
+          localStorage.setItem(keyBest, String(score));
+          setBestScore(score);
+        } else {
+          setBestScore(prevBest);
+        }
+      } catch (e) {
+        // ignore storage errors
+      }
+    }
+  }, [gameState, score]);
+
   const handlePlayAgain = () => {
     setScore(0);
     setQuestionCount(0);
@@ -348,6 +386,7 @@ const FlagQuizApp: React.FC = () => {
         showConfetti={showConfetti}
         onPlayAgain={handlePlayAgain}
         onReturn={handleReturnToStart}
+        bestScore={bestScore}
       />
     );
   }
@@ -364,6 +403,21 @@ const FlagQuizApp: React.FC = () => {
 
   return (
     <>
+      {/* persistent score header (always visible) */}
+      <div className='fixed top-4 right-4 z-50 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-md text-sm flex gap-4 items-center'>
+        <div className='text-gray-600'>
+          前回:{' '}
+          <span className='font-semibold text-gray-800'>
+            {lastScore ?? '-'}
+          </span>
+        </div>
+        <div className='text-gray-600'>
+          最高:{' '}
+          <span className='font-semibold text-gray-800'>
+            {bestScore ?? '-'}
+          </span>
+        </div>
+      </div>
       {showConfetti && <Confetti />}
       {currentCountry && (
         <GameView
