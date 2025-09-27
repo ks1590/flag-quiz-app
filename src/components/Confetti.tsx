@@ -93,8 +93,10 @@ const Confetti: React.FC = () => {
       <style>{`
         @keyframes shoot {
           0% { opacity: 1; transform: translateX(0) translateY(0) rotate(0deg); }
-          45% { opacity: 1; transform: translateX(var(--midX)) translateY(calc(var(--peak) * -1)) rotate(360deg); }
-          100% { opacity: 0; transform: translateX(var(--dx)) translateY(10vh) rotate(720deg); }
+          25% { transform: translateX(calc(var(--midX) * 0.5)) translateY(calc(var(--peak) * -0.5)) rotate(90deg); }
+          50% { transform: translateX(var(--midX)) translateY(calc(var(--peak) * -1)) rotate(180deg); }
+          75% { transform: translateX(calc(var(--midX) + var(--dx) * 0.5)) translateY(calc(var(--peak) * -0.5)) rotate(360deg); }
+          100% { opacity: 0; transform: translateX(var(--dx)) translateY(10vh) rotate(450deg); }
         }
       `}</style>
       <div className='confetti-container' aria-hidden='true'>
