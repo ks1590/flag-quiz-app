@@ -37,7 +37,8 @@ const ResultsView: React.FC<{
         <div className='text-sm text-gray-600 mb-4'>
           {bestScore !== null && (
             <div>
-              最高得点: <strong className='text-gray-800'>{bestScore}</strong>
+              ベストスコア:{' '}
+              <strong className='text-gray-800'>{bestScore}</strong>
             </div>
           )}
         </div>
