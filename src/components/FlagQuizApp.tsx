@@ -140,7 +140,7 @@ const FlagQuizApp: React.FC = () => {
     const fetchCountries = async () => {
       try {
         const response = await fetch(
-          'https://restcountries.com/v3.1/all?fields=name,translations,flags'
+          'https://restcountries.com/v3.1/all?fields=name,translations,flags,capital,region'
         );
         if (!response.ok) throw new Error('API fetch failed');
         let data: Country[] = await response.json();

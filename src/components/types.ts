@@ -12,6 +12,9 @@ export type Country = {
     svg: string;
     png: string;
   };
+  // optional fields from REST Countries
+  capital: string[];
+  region: string;
 };
 
 export type Difficulty = 'level0' | 'easy' | 'normal' | 'hard';

@@ -31,6 +31,67 @@ const GameView: React.FC<{
   onReturn,
   getButtonClass,
 }) => {
+  const regionTranslations: Record<string, string> = {
+    Africa: 'アフリカ',
+    Americas: 'アメリカ',
+    Asia: 'アジア',
+    Europe: 'ヨーロッパ',
+    Oceania: 'オセアニア',
+    Antarctic: '南極',
+  };
+
+  const capitalTranslations: Record<string, string> = {
+    Beijing: 'ペキン',
+    'New Delhi': 'ニューデリー',
+    'Washington, D.C.': 'ワシントンD.C.',
+    Jakarta: 'ジャカルタ',
+    Islamabad: 'イスラマバード',
+    Abuja: 'アブジャ',
+    Brasília: 'ブラジリア',
+    Dhaka: 'ダッカ',
+    Moscow: 'モスクワ',
+    'Mexico City': 'メキシコシティ',
+    Tokyo: '東京',
+    'Addis Ababa': 'アディスアベバ',
+    Manila: 'マニラ',
+    Cairo: 'カイロ',
+    Hanoi: 'ハノイ',
+    Kinshasa: 'キンシャサ',
+    Ankara: 'アンカラ',
+    Tehran: 'テヘラン',
+    Berlin: 'ベルリン',
+    Bangkok: 'バンコク',
+    London: 'ロンドン',
+    Paris: 'パリ',
+    Rome: 'ローマ',
+    Dodoma: 'ドドマ',
+    Pretoria: 'プレトリア',
+    Naypyidaw: 'ネピドー',
+    Nairobi: 'ナイロビ',
+    Seoul: 'ソウル',
+    Bogotá: 'ボゴタ',
+    Madrid: 'マドリード',
+    Kampala: 'カンパラ',
+    'Buenos Aires': 'ブエノスアイレス',
+    Algiers: 'アルジェ',
+    Khartoum: 'ハルツーム',
+    Kyiv: 'キーウ',
+    Baghdad: 'バグダッド',
+    Kabul: 'カブール',
+    Warsaw: 'ワルシャワ',
+    Ottawa: 'オタワ',
+    Rabat: 'ラバト',
+    Riyadh: 'リヤド',
+    Tashkent: 'タシケント',
+    Lima: 'リマ',
+    Luanda: 'ルアンダ',
+    'Kuala Lumpur': 'クアラルンプール',
+    Maputo: 'マプト',
+    Accra: 'アクラ',
+    "Sana'a": 'サナア',
+    Kathmandu: 'カトマンズ',
+    Caracas: 'カラカス',
+  };
   return (
     <div className='min-h-screen bg-blue-100 flex items-center justify-center p-4 font-sans'>
       <div className='w-full max-w-2xl bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-8 text-center text-gray-800'>
@@ -91,9 +152,31 @@ const GameView: React.FC<{
                   ざんねん...
                 </p>
               )}
-              <p className='text-lg mb-4'>
-                こたえは「{currentCountry.translations.jpn.common}」でした！
-              </p>
+              <div className='w-full bg-blue-50 p-4 rounded-lg text-left text-lg mb-4 space-y-2 border border-blue-200'>
+                <p>
+                  <Ruby rt='こた'>答</Ruby>え：{' '}
+                  <span className='font-bold text-2xl text-blue-700'>
+                    {currentCountry.translations.jpn.common}
+                  </span>
+                </p>
+                <p>
+                  <Ruby rt='しゅと'>首都</Ruby>：{' '}
+                  <span className='font-bold'>
+                    {(() => {
+                      const cap = currentCountry.capital?.[0];
+                      if (!cap) return '-';
+                      return capitalTranslations[cap] || cap;
+                    })()}
+                  </span>
+                </p>
+                <p>
+                  <Ruby rt='ちいき'>地域</Ruby>：{' '}
+                  <span className='font-bold'>
+                    {regionTranslations[currentCountry.region] ||
+                      currentCountry.region}
+                  </span>
+                </p>
+              </div>
               {(() => {
                 const isFinal =
                   typeof totalQuestions === 'number' &&
