@@ -9,7 +9,6 @@ const ResultsView: React.FC<{
   questionCount: number | null;
   totalQuestions: number | 'all' | null;
   showConfetti: boolean;
-  onPlayAgain: () => void;
   onReturn: () => void;
   bestScore?: number | null;
 }> = ({
@@ -17,7 +16,6 @@ const ResultsView: React.FC<{
   questionCount,
   totalQuestions,
   showConfetti,
-  onPlayAgain,
   onReturn,
   bestScore = null,
 }) => {
@@ -44,11 +42,6 @@ const ResultsView: React.FC<{
           )}
         </div>
         <div className='space-y-4'>
-          <button
-            onClick={onPlayAgain}
-            className='w-full py-4 bg-blue-600 text-white text-xl font-bold rounded-full shadow-lg hover:bg-blue-700 transform hover:scale-105 transition-all'>
-            <Ruby rt='おな'>同</Ruby>じせっていで もいちど！
-          </button>
           <button
             onClick={onReturn}
             className='w-full py-4 bg-gray-600 text-white text-xl font-bold rounded-full shadow-lg hover:bg-gray-700 transform hover:scale-105 transition-all'>

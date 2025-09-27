@@ -303,12 +303,6 @@ const FlagQuizApp: React.FC = () => {
     }
   }, [gameState, score]);
 
-  const handlePlayAgain = () => {
-    setScore(0);
-    setQuestionCount(0);
-    setGameState('playing');
-  };
-
   const handleReturnToStart = () => {
     setGameState('selecting');
     setDifficulty(null);
@@ -377,7 +371,6 @@ const FlagQuizApp: React.FC = () => {
         questionCount={questionCount}
         totalQuestions={totalQuestions}
         showConfetti={showConfetti}
-        onPlayAgain={handlePlayAgain}
         onReturn={handleReturnToStart}
         bestScore={bestScore}
       />
