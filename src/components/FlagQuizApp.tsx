@@ -119,6 +119,7 @@ const normalCountries = [
 const FlagQuizApp: React.FC = () => {
   const [allCountries, setAllCountries] = useState<Country[]>([]);
   const [quizCountries, setQuizCountries] = useState<Country[]>([]);
+  const [remainingCountries, setRemainingCountries] = useState<Country[]>([]);
   const [currentCountry, setCurrentCountry] = useState<Country | null>(null);
   const [options, setOptions] = useState<string[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -158,7 +159,8 @@ const FlagQuizApp: React.FC = () => {
   }, []);
 
   const setupQuestion = useCallback(() => {
-    if (quizCountries.length < 4) {
+    // need at least one remaining correct country and at least 4 options available overall
+    if (remainingCountries.length < 1 || quizCountries.length < 4) {
       setErrorCode('SETUP');
       setGameState('error');
       return;
@@ -168,16 +170,27 @@ const FlagQuizApp: React.FC = () => {
     setIsAnswered(false);
     setShowConfetti(false);
 
-    const shuffled = [...quizCountries].sort(() => 0.5 - Math.random());
-    const selectedCountries = shuffled.slice(0, 4);
-    const correctCountry = selectedCountries[0];
-    const choiceNames = selectedCountries.map((c) => c.translations.jpn.common);
-    const shuffledOptions = choiceNames.sort(() => 0.5 - Math.random());
+    // take next correct country from remainingCountries (guarantees no duplicate corrects)
+    const [nextCorrect, ...rest] = remainingCountries;
+    setRemainingCountries(rest);
 
-    setCurrentCountry(correctCountry);
+    // pick 3 distractors from quizCountries excluding the correct one
+    const pool = quizCountries.filter(
+      (c) => c.name.common !== nextCorrect.name.common
+    );
+    const shuffledPool = [...pool].sort(() => 0.5 - Math.random());
+    const distractors = shuffledPool.slice(0, 3);
+
+    const choiceNames = [
+      nextCorrect.translations.jpn.common,
+      ...distractors.map((c) => c.translations.jpn.common),
+    ];
+    const shuffledOptions = [...choiceNames].sort(() => 0.5 - Math.random());
+
+    setCurrentCountry(nextCorrect);
     setOptions(shuffledOptions);
     setQuestionCount((prev) => prev + 1);
-  }, [quizCountries]);
+  }, [remainingCountries, quizCountries]);
 
   const startGame = (num?: number | 'all') => {
     if (!difficulty) return;
@@ -226,6 +239,9 @@ const FlagQuizApp: React.FC = () => {
     }
 
     setQuizCountries(filtered);
+    // initialize remainingCountries as a shuffled copy of filtered so we can pop unique correct answers
+    const remaining = [...filtered].sort(() => 0.5 - Math.random());
+    setRemainingCountries(remaining);
     setTotalQuestions(count ?? 'all');
     setScore(0);
     setQuestionCount(0);
