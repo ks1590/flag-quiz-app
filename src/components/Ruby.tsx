@@ -2,11 +2,14 @@
 
 import React from 'react';
 
-const Ruby: React.FC<{ children: React.ReactNode; rt: string }> = ({ children, rt }) => (
+const Ruby: React.FC<{ children: React.ReactNode; rt: string }> = ({
+  children,
+  rt,
+}) => (
   <ruby>
     {children}
     <rp>(</rp>
-    <rt style={{ fontSize: '0.6em', color: '#333' }}>{rt}</rt>
+    <rt style={{ fontSize: '0.6em', color: 'currentColor' }}>{rt}</rt>
     <rp>)</rp>
   </ruby>
 );
