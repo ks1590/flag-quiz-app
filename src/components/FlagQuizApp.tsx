@@ -6,21 +6,114 @@ import Confetti from './Confetti';
 import SelectingView from './SelectingView';
 import GameView from './GameView';
 import ResultsView from './ResultsView';
-import {
-  Country,
-  Difficulty,
-  GameState,
-  ErrorCode,
-} from './types';
+import { Country, Difficulty, GameState, ErrorCode } from './types';
 
 // --- 主要国リスト ---
 const easyCountries = [
-  'China', 'India', 'United States', 'Indonesia', 'Pakistan', 'Nigeria', 'Brazil', 'Bangladesh', 'Russia', 'Mexico', 'Japan', 'Ethiopia', 'Philippines', 'Egypt', 'Vietnam', 'DR Congo', 'Turkey', 'Iran', 'Germany', 'Thailand', 'United Kingdom', 'France', 'Italy', 'Tanzania', 'South Africa', 'Myanmar', 'Kenya', 'South Korea', 'Colombia', 'Spain', 'Uganda', 'Argentina', 'Algeria', 'Sudan', 'Ukraine', 'Iraq', 'Afghanistan', 'Poland', 'Canada', 'Morocco', 'Saudi Arabia', 'Uzbekistan', 'Peru', 'Angola', 'Malaysia', 'Mozambique', 'Ghana', 'Yemen', 'Nepal', 'Venezuela',
+  'China',
+  'India',
+  'United States',
+  'Indonesia',
+  'Pakistan',
+  'Nigeria',
+  'Brazil',
+  'Bangladesh',
+  'Russia',
+  'Mexico',
+  'Japan',
+  'Ethiopia',
+  'Philippines',
+  'Egypt',
+  'Vietnam',
+  'DR Congo',
+  'Turkey',
+  'Iran',
+  'Germany',
+  'Thailand',
+  'United Kingdom',
+  'France',
+  'Italy',
+  'Tanzania',
+  'South Africa',
+  'Myanmar',
+  'Kenya',
+  'South Korea',
+  'Colombia',
+  'Spain',
+  'Uganda',
+  'Argentina',
+  'Algeria',
+  'Sudan',
+  'Ukraine',
+  'Iraq',
+  'Afghanistan',
+  'Poland',
+  'Canada',
+  'Morocco',
+  'Saudi Arabia',
+  'Uzbekistan',
+  'Peru',
+  'Angola',
+  'Malaysia',
+  'Mozambique',
+  'Ghana',
+  'Yemen',
+  'Nepal',
+  'Venezuela',
 ];
 
 const normalCountries = [
   ...easyCountries,
-  'Ivory Coast', 'Madagascar', 'Cameroon', 'North Korea', 'Australia', 'Niger', 'Sri Lanka', 'Burkina Faso', 'Mali', 'Romania', 'Malawi', 'Chile', 'Kazakhstan', 'Zambia', 'Guatemala', 'Ecuador', 'Syria', 'Netherlands', 'Senegal', 'Cambodia', 'Chad', 'Somalia', 'Zimbabwe', 'Guinea', 'Rwanda', 'Benin', 'Burundi', 'Tunisia', 'Bolivia', 'Belgium', 'Haiti', 'Cuba', 'South Sudan', 'Dominican Republic', 'Czech Republic', 'Greece', 'Jordan', 'Portugal', 'Azerbaijan', 'Sweden', 'Honduras', 'United Arab Emirates', 'Hungary', 'Tajikistan', 'Belarus', 'Austria', 'Papua New Guinea', 'Serbia', 'Israel', 'Switzerland',
+  'Ivory Coast',
+  'Madagascar',
+  'Cameroon',
+  'North Korea',
+  'Australia',
+  'Niger',
+  'Sri Lanka',
+  'Burkina Faso',
+  'Mali',
+  'Romania',
+  'Malawi',
+  'Chile',
+  'Kazakhstan',
+  'Zambia',
+  'Guatemala',
+  'Ecuador',
+  'Syria',
+  'Netherlands',
+  'Senegal',
+  'Cambodia',
+  'Chad',
+  'Somalia',
+  'Zimbabwe',
+  'Guinea',
+  'Rwanda',
+  'Benin',
+  'Burundi',
+  'Tunisia',
+  'Bolivia',
+  'Belgium',
+  'Haiti',
+  'Cuba',
+  'South Sudan',
+  'Dominican Republic',
+  'Czech Republic',
+  'Greece',
+  'Jordan',
+  'Portugal',
+  'Azerbaijan',
+  'Sweden',
+  'Honduras',
+  'United Arab Emirates',
+  'Hungary',
+  'Tajikistan',
+  'Belarus',
+  'Austria',
+  'Papua New Guinea',
+  'Serbia',
+  'Israel',
+  'Switzerland',
 ];
 
 const FlagQuizApp: React.FC = () => {
@@ -37,15 +130,21 @@ const FlagQuizApp: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false);
 
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
-  const [totalQuestions, setTotalQuestions] = useState<number | 'all' | null>(null);
+  const [totalQuestions, setTotalQuestions] = useState<number | 'all' | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const response = await fetch('https://restcountries.com/v3.1/all?fields=name,translations,flags');
+        const response = await fetch(
+          'https://restcountries.com/v3.1/all?fields=name,translations,flags'
+        );
         if (!response.ok) throw new Error('API fetch failed');
         let data: Country[] = await response.json();
-        const filteredData = data.filter(c => c.translations.jpn?.common && c.flags.svg && c.name.common);
+        const filteredData = data.filter(
+          (c) => c.translations.jpn?.common && c.flags.svg && c.name.common
+        );
         setAllCountries(filteredData);
         setGameState('selecting');
       } catch (err) {
@@ -72,20 +171,37 @@ const FlagQuizApp: React.FC = () => {
     const shuffled = [...quizCountries].sort(() => 0.5 - Math.random());
     const selectedCountries = shuffled.slice(0, 4);
     const correctCountry = selectedCountries[0];
-    const choiceNames = selectedCountries.map(c => c.translations.jpn.common);
+    const choiceNames = selectedCountries.map((c) => c.translations.jpn.common);
     const shuffledOptions = choiceNames.sort(() => 0.5 - Math.random());
 
     setCurrentCountry(correctCountry);
     setOptions(shuffledOptions);
-    setQuestionCount(prev => prev + 1);
+    setQuestionCount((prev) => prev + 1);
   }, [quizCountries]);
 
-  const startGame = (num: number | 'all') => {
+  const startGame = (num?: number | 'all') => {
     if (!difficulty) return;
     let filtered: Country[] = [];
-    if (difficulty === 'easy') filtered = allCountries.filter(c => easyCountries.includes(c.name.common));
-    else if (difficulty === 'normal') filtered = allCountries.filter(c => normalCountries.includes(c.name.common));
-    else filtered = allCountries;
+
+    // choose pool based on difficulty
+    if (difficulty === 'level0') {
+      filtered = allCountries.filter((c) =>
+        easyCountries.includes(c.name.common)
+      );
+    } else if (difficulty === 'easy') {
+      filtered = allCountries.filter((c) =>
+        easyCountries.includes(c.name.common)
+      );
+    } else if (difficulty === 'normal') {
+      filtered = allCountries.filter((c) =>
+        normalCountries.includes(c.name.common)
+      );
+    } else if (difficulty === 'hard') {
+      filtered = allCountries;
+    } else {
+      // superhard or fallback
+      filtered = allCountries;
+    }
 
     if (filtered.length < 4) {
       setErrorCode('SETUP');
@@ -93,8 +209,24 @@ const FlagQuizApp: React.FC = () => {
       return;
     }
 
+    // determine count (default based on difficulty if num not passed)
+    let count: number | 'all' | undefined = num;
+    if (typeof count === 'undefined') {
+      if (difficulty === 'level0') count = 20;
+      else if (difficulty === 'easy') count = 30;
+      else if (difficulty === 'normal') count = 50;
+      else if (difficulty === 'hard') count = 100;
+      else count = 'all';
+    }
+
+    // if numeric, sample that many countries from filtered
+    if (typeof count === 'number' && filtered.length > count) {
+      const shuffled = [...filtered].sort(() => 0.5 - Math.random());
+      filtered = shuffled.slice(0, count);
+    }
+
     setQuizCountries(filtered);
-    setTotalQuestions(num);
+    setTotalQuestions(count ?? 'all');
     setScore(0);
     setQuestionCount(0);
     setGameState('playing');
@@ -113,13 +245,14 @@ const FlagQuizApp: React.FC = () => {
     if (!selectedAnswer || !currentCountry) return;
     setIsAnswered(true);
     if (selectedAnswer === currentCountry.translations.jpn.common) {
-      setScore(prev => prev + 1);
+      setScore((prev) => prev + 1);
       setShowConfetti(true);
     }
   };
 
   const handleNextQuestion = () => {
-    if (typeof totalQuestions === 'number' && questionCount >= totalQuestions) setGameState('results');
+    if (typeof totalQuestions === 'number' && questionCount >= totalQuestions)
+      setGameState('results');
     else setupQuestion();
   };
 
@@ -136,50 +269,86 @@ const FlagQuizApp: React.FC = () => {
   };
 
   const getButtonClass = (option: string) => {
-    if (!isAnswered) return selectedAnswer === option ? 'bg-yellow-300 transform scale-105' : 'bg-white hover:bg-yellow-100';
+    if (!isAnswered)
+      return selectedAnswer === option
+        ? 'bg-yellow-300 transform scale-105'
+        : 'bg-white hover:bg-yellow-100';
     const isCorrect = option === currentCountry?.translations.jpn.common;
-    if (isCorrect) return 'bg-green-400 text-white transform scale-105 animate-pulse';
+    if (isCorrect)
+      return 'bg-green-400 text-white transform scale-105 animate-pulse';
     if (selectedAnswer === option && !isCorrect) return 'bg-red-400 text-white';
     return 'bg-gray-200 text-gray-500';
   };
 
-  if (gameState === 'loading') return (
-    <div className="flex items-center justify-center min-h-screen bg-blue-50">
-      <p className="text-2xl font-bold text-blue-600">いま、せかいの<Ruby rt="こっき">国旗</Ruby>をあつめているよ！</p>
-    </div>
-  );
-
-  if (gameState === 'error') return (
-    <div className="flex items-center justify-center min-h-screen bg-red-50">
-      <div className="text-xl font-bold text-red-600 text-center leading-relaxed p-4">
-        {errorCode === 'FETCH' && (
-          <p><Ruby rt="くに">国</Ruby>のデータの<Ruby rt="よ">読</Ruby>み<Ruby rt="こ">込</Ruby>みに<Ruby rt="しっぱい">失敗</Ruby>しました。<br/>ページを<Ruby rt="こうしん">更新</Ruby>してみてください。</p>
-        )}
-        {errorCode === 'SETUP' && (
-          <p>クイズを<Ruby rt="さくせい">作成</Ruby>するのに<Ruby rt="じゅうぶん">十分</Ruby>な<Ruby rt="くに">国</Ruby>データがありません。</p>
-        )}
+  if (gameState === 'loading')
+    return (
+      <div className='flex items-center justify-center min-h-screen bg-blue-50'>
+        <p className='text-2xl font-bold text-blue-600'>
+          いま、せかいの<Ruby rt='こっき'>国旗</Ruby>をあつめているよ！
+        </p>
       </div>
-    </div>
-  );
+    );
+
+  if (gameState === 'error')
+    return (
+      <div className='flex items-center justify-center min-h-screen bg-red-50'>
+        <div className='text-xl font-bold text-red-600 text-center leading-relaxed p-4'>
+          {errorCode === 'FETCH' && (
+            <p>
+              <Ruby rt='くに'>国</Ruby>のデータの<Ruby rt='よ'>読</Ruby>み
+              <Ruby rt='こ'>込</Ruby>みに<Ruby rt='しっぱい'>失敗</Ruby>
+              しました。
+              <br />
+              ページを<Ruby rt='こうしん'>更新</Ruby>してみてください。
+            </p>
+          )}
+          {errorCode === 'SETUP' && (
+            <p>
+              クイズを<Ruby rt='さくせい'>作成</Ruby>するのに
+              <Ruby rt='じゅうぶん'>十分</Ruby>な<Ruby rt='くに'>国</Ruby>
+              データがありません。
+            </p>
+          )}
+        </div>
+      </div>
+    );
 
   if (gameState === 'selecting') {
-    return <SelectingView difficulty={difficulty} setDifficulty={setDifficulty} startGame={startGame} />;
+    return (
+      <SelectingView
+        difficulty={difficulty}
+        setDifficulty={setDifficulty}
+        startGame={startGame}
+      />
+    );
   }
 
   if (gameState === 'results') {
-    return <ResultsView score={score} questionCount={questionCount} totalQuestions={totalQuestions} showConfetti={showConfetti} onPlayAgain={handlePlayAgain} onReturn={handleReturnToStart} />;
+    return (
+      <ResultsView
+        score={score}
+        questionCount={questionCount}
+        totalQuestions={totalQuestions}
+        showConfetti={showConfetti}
+        onPlayAgain={handlePlayAgain}
+        onReturn={handleReturnToStart}
+      />
+    );
   }
 
   if (gameState === 'playing' && !currentCountry) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-blue-50">
-        <p className="text-2xl font-bold text-blue-600">もんだいをつくってるよ！</p>
+      <div className='flex items-center justify-center min-h-screen bg-blue-50'>
+        <p className='text-2xl font-bold text-blue-600'>
+          もんだいをつくってるよ！
+        </p>
       </div>
     );
   }
 
   return (
-    <>{showConfetti && <Confetti />}
+    <>
+      {showConfetti && <Confetti />}
       {currentCountry && (
         <GameView
           currentCountry={currentCountry}
@@ -201,4 +370,3 @@ const FlagQuizApp: React.FC = () => {
 };
 
 export default FlagQuizApp;
-

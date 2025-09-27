@@ -14,8 +14,13 @@ export type Country = {
   };
 };
 
-export type Difficulty = 'easy' | 'normal' | 'hard';
-export type GameState = 'selecting' | 'playing' | 'loading' | 'error' | 'results';
+export type Difficulty = 'level0' | 'easy' | 'normal' | 'hard';
+export type GameState =
+  | 'selecting'
+  | 'playing'
+  | 'loading'
+  | 'error'
+  | 'results';
 export type ErrorCode = 'FETCH' | 'SETUP' | null;
 
 export type ConfettiParticle = {
